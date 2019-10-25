@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+ 
 use Carbon\Carbon;
 use Intervention\Image\Facades\Image;
 
@@ -48,6 +49,7 @@ class ArticleController extends Controller
     if ($request->hasFile('image') && $request->file('image')->isValid()) {
       $file = $request->file('image');
       $extension = Carbon::now() . '_' . $file->getClientOriginalName();
+      $extension = preg_replace('/[^A-Za-z0-9-.]+/', '-', $extension);
       $thumb = Image::make($file->getRealPath())->resize(100, 100, function ($constraint) {
         $constraint->aspectRatio(); //maintain image ratio
       });
@@ -65,4 +67,14 @@ class ArticleController extends Controller
 
     return response()->json(['msg' => 'Something went wrong'], 500);
   }
+
+  public function getArticleImage($image_name)
+  {
+    try {
+      $path = './uploads/article_images/'.$image_name;
+      return new BinaryFileResponse($path);
+    } catch (\Exception $e) {
+      return response()->json(['message' => 'Not Found.'], 404);
+    }
+  }    
 }
