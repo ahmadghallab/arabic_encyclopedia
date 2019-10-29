@@ -50,12 +50,11 @@ class ArticleController extends Controller
       $file = $request->file('image');
       $extension = Carbon::now() . '_' . $file->getClientOriginalName();
       $extension = preg_replace('/[^A-Za-z0-9-.]+/', '-', $extension);
-      $thumb = Image::make($file->getRealPath())->resize(100, 100, function ($constraint) {
+      $new_image = Image::make($file->getRealPath())->resize(750, 350, function ($constraint) {
         $constraint->aspectRatio(); //maintain image ratio
       });
       $destinationPath = './uploads/article_images';
-      $file->move($destinationPath, $extension);
-      $thumb->save($destinationPath.'/thumb_'.$extension);
+      $new_image->save($destinationPath.'/'.$extension);
       $data['image'] = $extension;
     }
 
@@ -76,5 +75,18 @@ class ArticleController extends Controller
     } catch (\Exception $e) {
       return response()->json(['message' => 'Not Found.'], 404);
     }
-  }    
+  }
+  
+  public function update(Request $request, $id)
+  {
+
+    $article = Article::findOrFail($id);
+    $input = $request->except('token');
+
+    if ($article->update($input)) {
+      return response()->json(['msg' => 'resource has been updated'], 201);
+    }
+
+    return response()->json(['msg' => 'Something went wrong'], 500);
+  }
 }
