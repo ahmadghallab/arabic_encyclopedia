@@ -81,9 +81,23 @@ class ArticleController extends Controller
   {
 
     $article = Article::findOrFail($id);
-    $input = $request->except('token');
+    $data = $request->except('token');
 
-    if ($article->update($input)) {
+    if ($request->hasFile('image') && $request->file('image')->isValid()) {
+      $last_image = './uploads/article_images/' . $article['image'];
+      if (file_exists($last_image)) unlink($last_image);
+      $file = $request->file('image');
+      $extension = Carbon::now() . '_' . $file->getClientOriginalName();
+      $extension = preg_replace('/[^A-Za-z0-9-.]+/', '-', $extension);
+      $new_image = Image::make($file->getRealPath())->resize(750, 350, function ($constraint) {
+        $constraint->aspectRatio();
+      });
+      $destinationPath = './uploads/article_images';
+      $new_image->save($destinationPath.'/'.$extension);
+      $data['image'] = $extension;
+    }
+
+    if ($article->update($data)) {
       return response()->json(['msg' => 'resource has been updated'], 201);
     }
 

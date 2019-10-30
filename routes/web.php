@@ -20,7 +20,9 @@ $router->group(['prefix' => 'api/v1'], function() use ($router) {
     $router->post('articles', [
         'uses' => 'ArticleController@store'
     ]);
-    $router->patch('article/{id}', 'ArticleController@update');
+    $router->post('article/{id}', [
+        'uses' => 'ArticleController@update'
+    ]);
     $router->get('article/image/{image_name}', [
         'uses' => 'ArticleController@getArticleImage'
     ]);
