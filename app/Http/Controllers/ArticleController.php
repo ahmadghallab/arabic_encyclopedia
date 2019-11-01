@@ -21,13 +21,13 @@ class ArticleController extends Controller
 
   public function index()
   {
-    $articles = Article::all();
+    $articles = Article::with('topic')->paginate(21);
     return response()->json($articles);
   }
 
   public function show($id)
   {
-    $article = Article::where('id', $id)->first();
+    $article = Article::with(['topic', 'user'])->where('id', $id)->first();
 
     if ($article) {
       return response()->json($article);
