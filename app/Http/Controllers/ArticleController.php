@@ -28,9 +28,13 @@ class ArticleController extends Controller
   public function show($id)
   {
     $article = Article::with(['topic', 'user'])->where('id', $id)->first();
+    $related_articles = Article::where('id', '!=', $id)->where('topic', $article->topic)->limit(5)->get();
 
     if ($article) {
-      return response()->json($article);
+      return response()->json([
+        'article' => $article,
+        'related_articles' => $related_articles
+      ]);
     }
 
     return response()->json(['message' => 'Not Found.'], 404);
