@@ -21,14 +21,29 @@ class ArticleController extends Controller
 
   public function index()
   {
-    $articles = Article::with('topic')->paginate(21);
-    return response()->json($articles);
+    $random_articles = Article::select('id','title', 'summary', 'image', 'topic')->with('topic')->inRandomOrder()->limit(3)->get();
+    $ordered_articles = Article::select('id','title', 'summary', 'image', 'topic')->with('topic')->paginate(21);
+    return response()->json([
+      'ordered_articles' => $ordered_articles,
+      'random_articles' => $random_articles
+    ]);
   }
 
   public function show($id)
   {
+    $article = Article::where('id', $id)->first();
+
+    if ($article) {
+      return response()->json($article);
+    }
+
+    return response()->json(['message' => 'Not Found.'], 404);
+  }
+
+  public function showWithRelated($id)
+  {
     $article = Article::with(['topic', 'user'])->where('id', $id)->first();
-    $related_articles = Article::where('id', '!=', $id)->where('topic', $article->topic)->limit(5)->get();
+    $related_articles = Article::where('id', '!=', $id)->where('topic', $article->topic)->limit(6)->get();
 
     if ($article) {
       return response()->json([
@@ -108,12 +123,28 @@ class ArticleController extends Controller
     ]);
 
     $article = Article::findOrFail($id);
-    $data = $request->except(['token', 'image']);
+    $data = $request->except(['token', 'image', 'user']);
 
     if ($article->update($data)) {
       return response()->json(['msg' => 'resource has been updated'], 201);
     }
 
     return response()->json(['msg' => 'Something went wrong'], 500);
+  }
+  public function destroy($id)
+  {
+    $article = Article::findOrFail($id);
+    
+    $destinationPath = './uploads/article_images';
+
+    if ($article['image'] && file_exists($destinationPath . '/' . $article->image)) {
+      unlink($destinationPath . '/' . $article->image);
+    }
+
+    if ($article->delete()) {
+      return response()->json(['message' => 'Article deleted.'], 204);
+    }
+
+    return response()->json(['message' => 'Something went wrong!'], 500);
   }
 }

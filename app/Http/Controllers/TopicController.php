@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; 
 
 use App\Topic;
 
@@ -17,8 +17,19 @@ class TopicController extends Controller
 
   public function index()
   {
-    $topics = Topic::all();
+    $topics = Topic::withCount('articles')->get();
     return response()->json($topics);
+  }
+
+  public function show ($id) 
+  {
+    $topic = Topic::withCount('articles')->where('id', $id)->first();
+
+    if ($topic) {
+      return response()->json($topic);
+    }
+
+    return response()->json(['message' => 'Not Found.'], 404);
   }
 
   public function store(Request $request)

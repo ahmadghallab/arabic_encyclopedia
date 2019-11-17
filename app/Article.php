@@ -11,14 +11,7 @@ class Article extends Model
    *
    * @var array
    */
-  protected $fillable = ['title', 'image', 'tags', 'user', 'topic', 'body'];
-
-  /**
-   * The attributes excluded from the model's JSON form.
-   *
-   * @var array
-   */
-  protected $hidden = ['updated_at'];
+  protected $fillable = ['title', 'image', 'keywords', 'user', 'topic', 'body', 'summary', 'references', 'views', 'published'];
 
   public function topic()
   {

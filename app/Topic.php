@@ -19,4 +19,10 @@ class Topic extends Model
    * @var array
    */
   protected $hidden = ['created_at', 'updated_at'];
-}
+
+  public function articles()
+  {
+    return $this->hasMany('App\Article', 'topic');
+  }
+
+} 

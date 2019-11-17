@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ChangeImageAndTagsToNullable extends Migration
+class AddSummaryReferencesColumnsToArticles extends Migration
 {
     /**
      * Run the migrations.
@@ -14,11 +14,11 @@ class ChangeImageAndTagsToNullable extends Migration
     public function up()
     {
         Schema::table('articles', function (Blueprint $table) {
-            $table->string('image')->nullable()->change();
-            $table->string('tags')->nullable()->change();
+            $table->string('summary')->nullable();
+            $table->string('references')->nullable();
         });
     }
- 
+
     /**
      * Reverse the migrations.
      *
@@ -27,8 +27,7 @@ class ChangeImageAndTagsToNullable extends Migration
     public function down()
     {
         Schema::table('articles', function (Blueprint $table) {
-            $table->string('image')->nullable(false)->change();
-            $table->string('tags')->nullable(false)->change();
+            $table->dropColumn(['summary', 'references']);
         });
     }
 }

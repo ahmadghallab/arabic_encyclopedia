@@ -80,7 +80,8 @@ class AuthController extends Controller
         if ( $request->input('password') == Crypt::decrypt($user->password) ) 
         {
             return response()->json([
-                'token' => $this->jwt($user)
+								'token' => $this->jwt($user),
+								'user_id' => $user->id
             ], 200);
         }
 
@@ -88,4 +89,34 @@ class AuthController extends Controller
             'error' => 'Email or password is wrong.'
         ], 400);
 	}
+
+	public function show ($id) 
+  {
+    $user = User::where('id', $id)->first();
+
+    if ($user) {
+      return response()->json($user);
+    }
+
+    return response()->json(['message' => 'Not Found.'], 404);
+	}
+
+	public function update(Request $request, $id)
+  {
+    $this->validate($request, [
+			'first_name' => 'required',
+			'last_name' => 'required',
+			'email' => 'required|email'
+		]);
+
+    $user = User::findOrFail($id);
+    $data = $request->except(['token', 'profile_photo']);
+
+    if ($user->update($data)) {
+      return response()->json(['msg' => 'resource has been updated'], 201);
+    }
+
+    return response()->json(['msg' => 'Something went wrong'], 500);
+  }
+	
 }
