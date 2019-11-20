@@ -22,5 +22,5 @@ $router->group(['prefix' => 'api/v1'], function() use ($router) {
     $router->post('topics', 'TopicController@store');
     $router->get('topic/{id}', 'TopicController@show');
     $router->patch('topic/{id}', 'TopicController@update');
-    $router->delete('topic/{id}', 'TopicController@destroy');
+    $router->delete('topic/{id}', 'TopicController@destroy'); 
 });

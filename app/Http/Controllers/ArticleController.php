@@ -19,14 +19,19 @@ class ArticleController extends Controller
     ]);
   }
 
+  private function slugify($str) 
+  {
+    $text = html_entity_decode($str, ENT_QUOTES, 'UTF-8');
+    $text = preg_replace('~[\x{064B}-\x{065B}]~u', '', $text);
+    $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
+    $text = trim($text, '-');
+    return $text;
+  }
+
   public function index()
   {
-    $random_articles = Article::select('id','title', 'summary', 'image', 'topic')->with('topic')->inRandomOrder()->limit(3)->get();
-    $ordered_articles = Article::select('id','title', 'summary', 'image', 'topic')->with('topic')->paginate(21);
-    return response()->json([
-      'ordered_articles' => $ordered_articles,
-      'random_articles' => $random_articles
-    ]);
+    $articles = Article::select('id', 'slug','title', 'summary', 'image', 'topic')->with('topic')->paginate(15);
+    return response()->json($articles);
   }
 
   public function show($id)
@@ -35,7 +40,7 @@ class ArticleController extends Controller
 
     if ($article) {
       return response()->json($article);
-    }
+    } 
 
     return response()->json(['message' => 'Not Found.'], 404);
   }
@@ -64,6 +69,7 @@ class ArticleController extends Controller
 
     $data = $request->all();
     $data['user'] = $request->user;
+    $data['slug'] = $this->slugify($data['title']);
 
     $article = new Article($data);
 
@@ -124,9 +130,13 @@ class ArticleController extends Controller
 
     $article = Article::findOrFail($id);
     $data = $request->except(['token', 'image', 'user']);
+    $data['slug'] = $this->slugify($data['title']);
 
     if ($article->update($data)) {
-      return response()->json(['msg' => 'resource has been updated'], 201);
+      return response()->json([
+        'article_id' => $article->id,
+        'article_slug' => $article->slug
+      ]);
     }
 
     return response()->json(['msg' => 'Something went wrong'], 500);

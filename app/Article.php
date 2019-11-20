@@ -11,7 +11,7 @@ class Article extends Model
    *
    * @var array
    */
-  protected $fillable = ['title', 'image', 'keywords', 'user', 'topic', 'body', 'summary', 'references', 'views', 'published'];
+  protected $fillable = ['title', 'slug', 'image', 'keywords', 'user', 'topic', 'body', 'summary', 'references', 'views', 'published'];
 
   public function topic()
   {
