@@ -7,7 +7,7 @@
     "require": {
         "php": "^7.2",
         "doctrine/dbal": "^2.9",
-        "firebase/php-jwt": "^5.0",
+        "firebase/php-jwt": "^6.0",
         "intervention/image": "^2.5",
         "laravel/lumen-framework": "^6.0"
     },
